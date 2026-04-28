@@ -83,8 +83,8 @@ class SFTDataset(Dataset):
 
 def main():
     parser = argparse.ArgumentParser(description="Hybrid DRQC-Compress Training")
-    parser.add_argument("--model_path", type=str, default="/private/models/Qwen2.5-Coder-32B-Instruct")
-    parser.add_argument("--data_path", type=str, default="/private/THeWakeSystems-QRUN-Qwen2.5-coder-32B/large_distill_data.json")
+    parser.add_argument("--model_path", type=str, default="/private/models/Springhead-v1.0")
+    parser.add_argument("--data_path", type=str, default="/private/Springhead-v1.0/large_distill_data.json")
     parser.add_argument("--replace_layers", type=int, nargs="+", default=list(range(48, 64)))
     parser.add_argument("--u_proj_output_dim", type=int, default=4)
     parser.add_argument("--mlp_hidden_size", type=int, default=128)
@@ -97,7 +97,7 @@ def main():
     parser.add_argument("--batch_size", type=int, default=1)
     parser.add_argument("--lr", type=float, default=1e-4)
     parser.add_argument("--max_length", type=int, default=512)
-    parser.add_argument("--save_path", type=str, default="/private/THeWakeSystems-QRUN-Qwen2.5-coder-32B/checkpoints_hybrid_v2")
+    parser.add_argument("--save_path", type=str, default="/private/Springhead-v1.0/checkpoints_hybrid_v2")
     parser.add_argument("--save_every_n_steps", type=int, default=2000)
     parser.add_argument("--gradient_accumulation_steps", type=int, default=16)
     parser.add_argument("--warmup_ratio", type=float, default=0.1)

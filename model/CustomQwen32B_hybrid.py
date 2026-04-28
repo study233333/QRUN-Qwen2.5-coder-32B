@@ -7,7 +7,7 @@ DRQC-Compress: 4-Component Hybrid Architecture
 3. EntanglementLayer — Low-rank dimensional mixing corresponding to CNOT/CZ 2-qubit gates
 4. Deep Re-uploading MLP — Multi-layer variational circuit + data re-uploading
 
-Goal: Compress the MLP layers of Qwen2.5-Coder-32B, achieving 98%+ parameter compression in replaced layers.
+Goal: Compress the MLP layers of Springhead-v1.0, achieving 98%+ parameter compression in replaced layers.
 """
 
 import torch
@@ -284,7 +284,7 @@ class Qwen2MLP_Hybrid(nn.Module):
         """Kaiming + Orthogonal initialization (Does not depend on original MLP weights)"""
         for qrun_layer in [self.gate_proj, self.up_proj, self.down_proj]:
             self._init_qrun(qrun_layer)
-        print("  -> Hybrid Q-RUN layers initialized successfully")
+        print("  -> Springhead Hybrid layers initialized successfully")
 
     def _init_qrun(self, layer):
         with torch.no_grad():
@@ -296,7 +296,7 @@ class Qwen2MLP_Hybrid(nn.Module):
             nn.init.zeros_(layer.u_proj.bias)
 
 class CustomQwen32B_Hybrid(Qwen2ForCausalLM):
-    """Qwen2.5-Coder-32B with DRQC-Compress Hybrid Q-RUN"""
+    """Springhead-v1.0 with DRQC-Compress Springhead Hybrid"""
     def __init__(self, model_name_or_path, replace_layers=None, qrun_config=None):
         config = Qwen2Config.from_pretrained(model_name_or_path)
         with init_empty_weights():
@@ -351,7 +351,7 @@ class CustomQwen32B_Hybrid(Qwen2ForCausalLM):
                     if hasattr(self.model.layers[i].mlp, 'count_parameters'))
         orig_mlp_per_layer = 3 * (5120 * 27648 + 27648)  # gate+up+down with bias
         orig_total = orig_mlp_per_layer * len(replace_layers)
-        print(f"\nParameter count: Total {total/1e9:.2f}B, Hybrid Q-RUN {qrun/1e6:.2f}M")
+        print(f"\nParameter count: Total {total/1e9:.2f}B, Springhead Hybrid {qrun/1e6:.2f}M")
         print(f"Replaced layers compression: {orig_total/1e6:.0f}M → {qrun/1e6:.1f}M ({qrun/orig_total*100:.1f}%)")
         print(f"VRAM (BF16) ~{total*2/1e9:.1f}GB")
 

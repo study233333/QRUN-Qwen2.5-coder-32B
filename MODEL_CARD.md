@@ -1,12 +1,12 @@
-# Model Card: Qwen2.5-Coder-32B (Hybrid Q-RUN)
+# Model Card: Springhead-v1.0
 
 ## Basic Information
-- Model Name: Qwen2.5-Coder-32B (Hybrid Q-RUN)
-- Version: v0.1-beta
+- Model Name: Springhead-v1.0
+- Version: v1.0
 - Author/Maintainer: TheWakeSystems
 
 ## Architecture and Modifications
-This model is based on Qwen2.5-Coder-32B. We replaced a subset of classical layers in the original model with Hybrid Q-RUN quantum-informed modules (8 out of 64 layers replaced) to drastically reduce parameter count and explore a quantum-classical hybrid inference pathway.
+Springhead-v1.0 replaces a subset of classical layers with Springhead Hybrid quantum-informed modules (8 out of 64 layers replaced) to drastically reduce parameter count and explore a quantum-classical hybrid inference pathway.
 
 ## Intended Use
 - Mathematical and logical reasoning tasks (performs normally)

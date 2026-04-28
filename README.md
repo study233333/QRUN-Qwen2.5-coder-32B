@@ -1,12 +1,12 @@
-# THeWakeSystems QRUN Hybrid-32B
+# Springhead-v1.0
 
 
 <div align="center">
-  <h3>Powered by Hybrid Q-RUN</h3>
+    <h3>Powered by Springhead Hybrid</h3>
 </div>
 
 
-[License](https://opensource.org/licenses/Apache-2.0) | [GitHub](https://github.com/study233333/QRUN-Qwen2.5-coder-32B)
+[License](https://opensource.org/licenses/Apache-2.0) | [GitHub](https://github.com/study233333)
 
 
 Optimized for Extreme Inference Efficiency · Massive Parameter Reduction · Quantum-Classical Hybrid Architecture
@@ -19,7 +19,7 @@ Optimized for Extreme Inference Efficiency · Massive Parameter Reduction · Qua
 - [Model Overview](#model-overview)
 - [Key Characteristics](#key-characteristics)
 - [Quick Start](#quick-start)
-- [What's New in QRUN Hybrid-32B](#whats-new-in-qrun-hybrid-32b)
+- [What's New in Springhead-v1.0](#whats-new-in-springhead-v10)
 - [Training & Fine-Tuning](#training--fine-tuning)
 - [Architecture](#architecture)
 - [Evaluation & Benchmarks](#evaluation--benchmarks)
@@ -32,13 +32,13 @@ Optimized for Extreme Inference Efficiency · Massive Parameter Reduction · Qua
 ## Highlights
 
 - **Extreme Parameter Compression:** Reduced trainable parameters from 3398M to 43.7M (≈ 1.3%), heavily minimizing memory footprint.
-- **Quantum-Classical Hybrid Layer:** Leverages proprietary Hybrid Q-RUN architecture by TheWakeSystems to replace specific transformer layers with quantum-informed modules.
+- **Quantum-Classical Hybrid Layer:** Leverages proprietary Springhead Hybrid architecture by TheWakeSystems to replace specific transformer layers with quantum-informed modules.
 - **Enterprise Multi-GPU Deployment:** Designed for 16× CUDA GPUs (BF16) with automated device mapping and memory load balancing.
 
 
 ## Model Overview
 
-THeWakeSystems QRUN Hybrid-32B is a model developed based on Qwen2.5-Coder-32B, developed by TheWakeSystems. The original Qwen2.5-Coder-32B is an open-weight model designed for powerful coding, reasoning, and mathematical tasks. This version is compressed using TheWakeSystems' proprietary Hybrid Q-RUN technology, reducing parameter count and memory requirements drastically while aiming to preserve core structural capabilities.
+Springhead-v1.0 is a model developed by TheWakeSystems. This version uses TheWakeSystems' proprietary Springhead Hybrid technology, reducing parameter count and memory requirements drastically while aiming to preserve core structural capabilities.
 
 The model is intended for constrained hardware environments requiring multi-GPU distributed inference where traditional memory footprints are prohibitive.
 
@@ -47,11 +47,11 @@ The model is intended for constrained hardware environments requiring multi-GPU 
 
 | Feature | Description |
 | :--- | :--- |
-| **Base model** | Qwen2.5-Coder-32B |
+| **Base model** | Springhead-v1.0 |
 | **Target Workloads** | Mathematical reasoning, logic, code generation |
-| **Parameters** | 43.7M trainable parameters after Hybrid Q-RUN compression (reduced vs. base 3398M active layers) |
+| **Parameters** | 43.7M trainable parameters after Springhead Hybrid compression (reduced vs. base 3398M active layers) |
 | **Architecture** | Quantum-Classical Hybrid Decoder-only Transformer |
-| **Compression** | Hybrid Q-RUN (proprietary quantum-informed layer replacement) |
+| **Compression** | Springhead Hybrid (proprietary quantum-informed layer replacement) |
 | **Primary language** | English / Chinese |
 | **Recommended Hardware** | 16× CUDA GPUs (BF16), total effective VRAM ≈ 58.8 GB |
 
@@ -77,7 +77,7 @@ import torch
 from transformers import AutoTokenizer
 from scripts.benchmark_hybrid import load_model, generate
 
-model_path = "/path/to/base/Qwen2.5-Coder-32B"
+model_path = "/path/to/base/Springhead-v1.0"
 checkpoint_path = "checkpoints/checkpoints_hybrid_v2/epoch_2.pt"
 
 # Initialize Tokenizer
@@ -104,29 +104,29 @@ For a full benchmark suite, run the integrated script:
 
 ```bash
 python scripts/benchmark_hybrid.py \
-    --model_path /path/to/base/Qwen2.5-Coder-32B \
+    --model_path /path/to/base/Springhead-v1.0 \
     --checkpoint checkpoints/checkpoints_hybrid_v2/epoch_2.pt \
     --device cuda \
     --dtype bf16
 ```
 
 
-## What's New in QRUN Hybrid-32B
+## What's New in Springhead-v1.0
 
 ### Summary
 
-- **Model developed based on Qwen2.5-Coder-32B:** Inherits the strong coding and reasoning foundations.
+- **Model developed as Springhead-v1.0:** Provides a compact architecture for coding and reasoning workloads.
 - **Quantum-Classical Entanglement:** Uses `MonarchProj` and `EntanglementLayer` modules in place of standard MLP layers (e.g., layers 48 to 63 target replacement).
 - **Automated Device Dispatch:** The inference script seamlessly charts GPU memory and distributes the hybrid model symmetrically using the `accelerate` library.
 
 
 ## Training & Fine-Tuning
 
-### Base Model: Qwen2.5-Coder-32B
-The base model was trained extensively on code, mathematics, and high-quality text datasets.
+### Base Model: Springhead-v1.0
+The model is trained for code, mathematics, and high-quality text-oriented workloads.
 
-### Hybrid Q-RUN Compression & Knowledge Distillation
-- **Compression:** TheWakeSystems' Hybrid Q-RUN architecture substitutes classical layers with quantum-informed tensor networks.
+### Springhead Hybrid Compression & Knowledge Distillation
+- **Compression:** TheWakeSystems' Springhead Hybrid architecture substitutes classical layers with quantum-informed tensor networks.
 - **Fine-tuning:** The replaced layers are trained via Knowledge Distillation (KD) or standard SFT to match the original outputs, mapping massive parameter spaces into highly compact representations.
 - **Training Script:** We provide `scripts/train_hybrid.py` to replicate the SFT / KD behavior, freezing the unchanged base model parameters and updating only the lightweight quantum-informed projections.
 
@@ -137,7 +137,7 @@ The base model was trained extensively on code, mathematics, and high-quality te
 
 | Metric | Value |
 | :--- | :--- |
-| **Base model** | Qwen/Qwen2.5-Coder-32B-Instruct |
+| **Base model** | Springhead-v1.0 |
 | **Trainable parameters** | 43.7M |
 | **Original target parameters** | 3398M |
 | **Compression Ratio** | ≈ 1.3% |
@@ -156,7 +156,7 @@ Currently, due to the extreme nature of the 1.3% compression ratio, generation c
 ## Languages
 
 - **Primary languages:** English, Chinese
-- **Other languages:** Supported via base model, but performance under Hybrid Q-RUN compression has not been systematically measured.
+- **Other languages:** Supported, but performance under Springhead Hybrid compression has not been systematically measured.
 
 
 ## Intended Use
@@ -176,7 +176,7 @@ Currently, due to the extreme nature of the 1.3% compression ratio, generation c
 
 ### Known Limitations
 - **Generation Quality Regressions:** Extreme compression strategies introduce task-specific degradations. The current iteration may exhibit token repetition and semantic discontinuities.
-- **Model format:** Exact parity with Qwen2.5-Coder-32B is not guaranteed.
+- **Model format:** Exact parity with upstream baselines is not guaranteed.
 
 ### Recommendations
 - Perform task-specific evaluation prior to deployment.
@@ -187,11 +187,11 @@ Currently, due to the extreme nature of the 1.3% compression ratio, generation c
 
 | Attribute | Details |
 | :--- | :--- |
-| **Model name** | QRUN Hybrid-32B |
-| **Based on** | Qwen/Qwen2.5-Coder-32B-Instruct |
+| **Model name** | Springhead-v1.0 |
+| **Based on** | Springhead-v1.0 |
 | **Developed by** | TheWakeSystems |
 | **License** | Apache 2.0 |
-| **Architecture** | Hybrid Q-RUN |
+| **Architecture** | Springhead Hybrid |
 
 
 ---
