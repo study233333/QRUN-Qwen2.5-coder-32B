@@ -1,107 +1,198 @@
-# TheWakeSystems — QRUN Hybrid Compression for Qwen2.5-Coder-32B
+# THeWakeSystems QRUN Hybrid-32B
 
-This repository contains TheWakeSystems' internally developed QRUN Hybrid compression project for the Qwen2.5-Coder-32B model. TheWakeSystems presents a quantum-classical hybrid architecture (Hybrid Q-RUN) that replaces selected model layers with quantum-informed modules to achieve extreme parameter compression and enterprise-grade multi-GPU distributed inference.
 
-## Project Overview
+<div align="center">
+  <h3>Powered by Hybrid Q-RUN</h3>
+</div>
 
-TheWakeSystems developed this Hybrid Q-RUN solution to address enterprise requirements for low-parameter, high-throughput large-model inference. Leveraging a quantum-classical hybrid layer replacement strategy and engineering optimizations for distributed execution, the project demonstrates how to reduce model parameter count dramatically while retaining utility for reasoning and code-related tasks in constrained hardware environments.
 
-Key facts retained from the original implementation:
+[License](https://opensource.org/licenses/Apache-2.0) | [GitHub](https://github.com/study233333/QRUN-Qwen2.5-coder-32B)
 
-- **Base model:** Qwen2.5-Coder-32B
-- **Proprietary architecture:** TheWakeSystems' Hybrid Q-RUN quantum-classical hybrid layers
-- **Parameter compression:** **3398M → 43.7M (≈ 1.3%)**
-- **Recommended hardware:** 16× CUDA GPUs (BF16), total effective GPU memory ≈ **58.8 GB**
-- **Primary entrypoint:** `scripts/benchmark_hybrid.py`
 
-## Core Technical Capabilities (TheWakeSystems R&D Highlights)
+Optimized for Extreme Inference Efficiency · Massive Parameter Reduction · Quantum-Classical Hybrid Architecture
 
-- **Quantum-classical hybrid layer replacement:** Selective replacement of classical transformer components with quantum-informed modules to reduce parameter count while preserving representational capacity where most needed.
-- **Extreme parameter compression:** Engineering and algorithmic optimizations enabling compression from billions of parameters to tens of millions without wholesale architecture redesign.
-- **Enterprise multi-GPU deployment:** Native support and deployment patterns for multi-card distributed inference with BF16 precision to maximize throughput and resource utilization.
-- **Inference optimizations:** Memory and compute optimizations targeted at minimizing runtime memory footprint and maximizing batch throughput across synchronized GPUs.
 
-## Performance Summary
+## Table of Contents
 
-- **Compression ratio:** **3398M → 43.7M** (~**1.3%**) of original parameter count.
-- **Memory profile:** Designed for deployment on a **16× GPU** BF16 cluster with an aggregate usable memory of **~58.8 GB**.
-- **Intended workloads:** Mathematical and logical reasoning, code generation (note: see Known Limitations below).
 
-These metrics represent TheWakeSystems' internal optimization targets and expected deployment envelope for enterprise environments.
+- [Highlights](#highlights)
+- [Model Overview](#model-overview)
+- [Key Characteristics](#key-characteristics)
+- [Quick Start](#quick-start)
+- [What's New in QRUN Hybrid-32B](#whats-new-in-qrun-hybrid-32b)
+- [Training & Fine-Tuning](#training--fine-tuning)
+- [Architecture](#architecture)
+- [Evaluation & Benchmarks](#evaluation--benchmarks)
+- [Languages](#languages)
+- [Intended Use](#intended-use)
+- [Safety & Limitations](#safety--limitations)
+- [Model Information](#model-information)
 
-## Enterprise Deployment — Quick Start
 
-The following steps describe a concise enterprise-oriented deployment flow for evaluation and integration.
+## Highlights
 
-1. Prepare environment
+- **Extreme Parameter Compression:** Reduced trainable parameters from 3398M to 43.7M (≈ 1.3%), heavily minimizing memory footprint.
+- **Quantum-Classical Hybrid Layer:** Leverages proprietary Hybrid Q-RUN architecture by TheWakeSystems to replace specific transformer layers with quantum-informed modules.
+- **Enterprise Multi-GPU Deployment:** Designed for 16× CUDA GPUs (BF16) with automated device mapping and memory load balancing.
+
+
+## Model Overview
+
+THeWakeSystems QRUN Hybrid-32B is a model developed based on Qwen2.5-Coder-32B, developed by TheWakeSystems. The original Qwen2.5-Coder-32B is an open-weight model designed for powerful coding, reasoning, and mathematical tasks. This version is compressed using TheWakeSystems' proprietary Hybrid Q-RUN technology, reducing parameter count and memory requirements drastically while aiming to preserve core structural capabilities.
+
+The model is intended for constrained hardware environments requiring multi-GPU distributed inference where traditional memory footprints are prohibitive.
+
+
+## Key Characteristics
+
+| Feature | Description |
+| :--- | :--- |
+| **Base model** | Qwen2.5-Coder-32B |
+| **Target Workloads** | Mathematical reasoning, logic, code generation |
+| **Parameters** | 43.7M trainable parameters after Hybrid Q-RUN compression (reduced vs. base 3398M active layers) |
+| **Architecture** | Quantum-Classical Hybrid Decoder-only Transformer |
+| **Compression** | Hybrid Q-RUN (proprietary quantum-informed layer replacement) |
+| **Primary language** | English / Chinese |
+| **Recommended Hardware** | 16× CUDA GPUs (BF16), total effective VRAM ≈ 58.8 GB |
+
+
+## Quick Start
+
+The repository provides automated scripts for both standard Hugging Face Transformers loading and inference benchmarking.
+
+### Environment Setup
 
 ```bash
 python -m venv venv
-source venv/bin/activate   # Linux / macOS
-venv\\Scripts\\activate    # Windows PowerShell
+source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-2. Handle model weights
+### Inference Generation
 
-- Place official weights under `checkpoints/` following `checkpoints/README.md` guidance.
-- **Large files (>100 MB):** use Git LFS or host weights in an enterprise artifact store (recommended). TheWakeSystems recommends hosting large model artifacts in dedicated storage (e.g., internal S3, private Hugging Face repository, or artifact registry) and referencing them in this repository.
+You can load the model seamlessly using our provided `CustomQwen32B_hybrid` wrapper:
 
-3. Run single-node inference benchmark
+```python
+import torch
+from transformers import AutoTokenizer
+from scripts.benchmark_hybrid import load_model, generate
+
+model_path = "/path/to/base/Qwen2.5-Coder-32B"
+checkpoint_path = "checkpoints/checkpoints_hybrid_v2/epoch_2.pt"
+
+# Initialize Tokenizer
+tokenizer = AutoTokenizer.from_pretrained(
+    model_path,
+    trust_remote_code=True,
+    local_files_only=True,
+)
+
+# Load the Hybrid Model (Auto-dispatches to available GPUs)
+model = load_model(
+    checkpoint_path=checkpoint_path,
+    model_path=model_path,
+    device="cuda",
+    dtype="bf16",
+    max_memory_per_device="20GiB"
+)
+
+response = generate(model, tokenizer, "Write a Python function to compute the greatest common divisor.")
+print(response)
+```
+
+For a full benchmark suite, run the integrated script:
 
 ```bash
-python scripts/benchmark_hybrid.py --model-path checkpoints/checkpoints_hybrid_v2
+python scripts/benchmark_hybrid.py \
+    --model_path /path/to/base/Qwen2.5-Coder-32B \
+    --checkpoint checkpoints/checkpoints_hybrid_v2/epoch_2.pt \
+    --device cuda \
+    --dtype bf16
 ```
 
-4. Distributed multi-GPU execution
 
-Follow your cluster's orchestration for multi-node or multi-GPU runs. Typical pattern for PyTorch-based distributed launch (example):
+## What's New in QRUN Hybrid-32B
 
-```bash
-# Example (adjust to your cluster/orchestrator):
-python -m torch.distributed.run --nproc_per_node=16 scripts/benchmark_hybrid.py --model-path checkpoints/checkpoints_hybrid_v2
-```
+### Summary
 
-For enterprise deployments, integrate this repository with your cluster scheduler (Slurm, Kubernetes, or proprietary orchestration), configure BF16 support and NCCL networking, and monitor GPU memory/temperature and interconnect usage.
+- **Model developed based on Qwen2.5-Coder-32B:** Inherits the strong coding and reasoning foundations.
+- **Quantum-Classical Entanglement:** Uses `MonarchProj` and `EntanglementLayer` modules in place of standard MLP layers (e.g., layers 48 to 63 target replacement).
+- **Automated Device Dispatch:** The inference script seamlessly charts GPU memory and distributes the hybrid model symmetrically using Hugging Face `accelerate`.
 
-## Project Structure
 
-The repository follows an enterprise project layout to separate concerns and accelerate integration:
+## Training & Fine-Tuning
 
-```
-THeWakeSystems-QRUN-Qwen2.5-coder-32B/
-├── README.md                     # This document (TheWakeSystems project overview)
-├── LICENSE                       # Project license and usage terms
-├── requirements.txt              # Python dependencies
-├── MODEL_CARD.md                 # Model card and evaluation notes
-├── model/                        # Model definitions and loader utilities
-├── scripts/                      # Benchmarks, inference and training scripts
-│   └── benchmark_hybrid.py       # Primary evaluation / demo entrypoint
-├── examples/                     # Minimal examples and usage snippets
-└── checkpoints/                  # Weight placement and storage guidance (NOT included in repo)
-```
+### Base Model: Qwen2.5-Coder-32B
+The base model was trained extensively on code, mathematics, and high-quality text datasets.
 
-> Note: The `checkpoints/` directory is a placeholder for large artifacts; TheWakeSystems does not include weight files in the repository. See `checkpoints/README.md` for storage and retrieval guidance.
+### Hybrid Q-RUN Compression & Knowledge Distillation
+- **Compression:** TheWakeSystems' Hybrid Q-RUN architecture substitutes classical layers with quantum-informed tensor networks.
+- **Fine-tuning:** The replaced layers are trained via Knowledge Distillation (KD) or standard SFT to match the original outputs, mapping massive parameter spaces into highly compact representations.
+- **Training Script:** We provide `scripts/train_hybrid.py` to replicate the SFT / KD behavior, freezing the unchanged base model parameters and updating only the lightweight quantum-informed projections.
 
-## Known Limitations and Responsible Disclosure
 
-TheWakeSystems maintains a rigorous and transparent disclosure of known issues observed during internal evaluation:
+## Architecture
 
-- **Generation quality regressions:** Code generation, general commonsense reasoning, and some multilingual tasks may exhibit token repetition and semantic discontinuities. This behavior is under active investigation by TheWakeSystems R&D and is documented to ensure responsible use in production.
-- **Model fidelity trade-offs:** Extreme compression strategies can introduce task-specific degradations. Evaluate the model against target enterprise tasks and apply domain-specific fine-tuning as required.
+### Model Specifications
 
-If you discover critical vulnerabilities or safety issues, please follow TheWakeSystems' security disclosure process (see `SECURITY.md` if available) or contact the maintainers directly.
+| Metric | Value |
+| :--- | :--- |
+| **Base model** | Qwen/Qwen2.5-Coder-32B-Instruct |
+| **Trainable parameters** | 43.7M |
+| **Original target parameters** | 3398M |
+| **Compression Ratio** | ≈ 1.3% |
+| **Replacement Layers** | Default targets layers 48 to 63 |
+| **u_proj_output_dim** | 4 |
+| **block_size & entangle_rank** | 64 |
 
-## License & Open Source Statement
 
-This project is published by TheWakeSystems under the terms provided in the `LICENSE` file. By using or distributing artifacts derived from this repository, you agree to comply with the license terms and any applicable export-control rules. TheWakeSystems retains intellectual property attribution for proprietary components and contributions in this repository where noted.
+## Evaluation & Benchmarks
 
-## About TheWakeSystems
+The benchmark script (`scripts/benchmark_hybrid.py`) evaluates the model across varying tasks: Code, Math, Logic, Commonsense, and Multilingual tasks.
 
-TheWakeSystems is a research-driven engineering organization specializing in large-model compression, quantum-classical hybrid architectures, and enterprise-scale inference systems. Our team combines expertise in model compression, quantum-informed algorithms, distributed systems, and production-grade ML engineering to deliver solutions that reduce deployment cost while enabling high-throughput model inference for enterprise applications.
+Currently, due to the extreme nature of the 1.3% compression ratio, generation capabilities experience significant degradation (e.g. repeated tokens, loss of coherent reasoning). Proceed with domain-specific fine-tuning or scaling up the `entangle_rank` for production deployments.
 
-For more information, partnership inquiries, or enterprise licensing, contact: contact@thewakesystems.example (replace with official contact)
+
+## Languages
+
+- **Primary languages:** English, Chinese
+- **Other languages:** Supported via base model, but performance under Hybrid Q-RUN compression has not been systematically measured.
+
+
+## Intended Use
+
+### Recommended Use Cases
+- Research into Quantum-Classical Hybrid Neural Networks.
+- Hardware-constrained inference environment testing.
+- Base architecture for extreme Knowledge Distillation experiments.
+
+### Out-of-Scope Uses
+- Production-grade code generation without further fine-tuning.
+- High-risk decision-making or zero-shot critical reasoning.
+- Any use that violates applicable safety laws or regulations.
+
+
+## Safety & Limitations
+
+### Known Limitations
+- **Generation Quality Regressions:** Extreme compression strategies introduce task-specific degradations. The current iteration may exhibit token repetition and semantic discontinuities.
+- **Model format:** Exact parity with Qwen2.5-Coder-32B is not guaranteed.
+
+### Recommendations
+- Perform task-specific evaluation prior to deployment.
+- Consider adjusting the `replace_layers` count or the `entangle_rank` in `create_hybrid_model` to balance speed/memory against model accuracy.
+
+
+## Model Information
+
+| Attribute | Details |
+| :--- | :--- |
+| **Model name** | QRUN Hybrid-32B |
+| **Based on** | Qwen/Qwen2.5-Coder-32B-Instruct |
+| **Developed by** | TheWakeSystems |
+| **License** | Apache 2.0 |
+| **Architecture** | Hybrid Q-RUN |
+
 
 ---
-
-For detailed model specifications and experimental provenance, refer to `MODEL_CARD.md` and `checkpoints/README.md`.
+Built by TheWakeSystems. For detailed model specifications, refer to `MODEL_CARD.md`.
