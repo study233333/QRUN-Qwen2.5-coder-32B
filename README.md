@@ -38,7 +38,7 @@ Optimized for Extreme Inference Efficiency · Massive Parameter Reduction · Qua
 
 ## Model Overview
 
-Springhead-v1.0 is a model developed by TheWakeSystems. This version uses TheWakeSystems' proprietary Springhead Hybrid technology, reducing parameter count and memory requirements drastically while aiming to preserve core structural capabilities.
+Springhead-v1.0 is a model developed by TheWakeSystems. This version is built on Qwen2.5-coder-32B and uses TheWakeSystems' proprietary Springhead Hybrid technology, reducing parameter count and memory requirements drastically while aiming to preserve core structural capabilities.
 
 The model is intended for constrained hardware environments requiring multi-GPU distributed inference where traditional memory footprints are prohibitive.
 
@@ -47,7 +47,7 @@ The model is intended for constrained hardware environments requiring multi-GPU 
 
 | Feature | Description |
 | :--- | :--- |
-| **Base model** | Springhead-v1.0 |
+| **Base model** | Qwen2.5-coder-32B |
 | **Target Workloads** | Mathematical reasoning, logic, code generation |
 | **Parameters** | 43.7M trainable parameters after Springhead Hybrid compression (reduced vs. base 3398M active layers) |
 | **Architecture** | Quantum-Classical Hybrid Decoder-only Transformer |
@@ -77,7 +77,7 @@ import torch
 from transformers import AutoTokenizer
 from scripts.benchmark_hybrid import load_model, generate
 
-model_path = "/path/to/base/Springhead-v1.0"
+model_path = "/path/to/base/Qwen2.5-coder-32B"
 checkpoint_path = "checkpoints/checkpoints_hybrid_v2/epoch_2.pt"
 
 # Initialize Tokenizer
@@ -104,7 +104,7 @@ For a full benchmark suite, run the integrated script:
 
 ```bash
 python scripts/benchmark_hybrid.py \
-    --model_path /path/to/base/Springhead-v1.0 \
+    --model_path /path/to/base/Qwen2.5-coder-32B \
     --checkpoint checkpoints/checkpoints_hybrid_v2/epoch_2.pt \
     --device cuda \
     --dtype bf16
@@ -122,7 +122,7 @@ python scripts/benchmark_hybrid.py \
 
 ## Training & Fine-Tuning
 
-### Base Model: Springhead-v1.0
+### Base Model: Qwen2.5-coder-32B
 The model is trained for code, mathematics, and high-quality text-oriented workloads.
 
 ### Springhead Hybrid Compression & Knowledge Distillation
@@ -137,7 +137,7 @@ The model is trained for code, mathematics, and high-quality text-oriented workl
 
 | Metric | Value |
 | :--- | :--- |
-| **Base model** | Springhead-v1.0 |
+| **Base model** | Qwen2.5-coder-32B |
 | **Trainable parameters** | 43.7M |
 | **Original target parameters** | 3398M |
 | **Compression Ratio** | ≈ 1.3% |
@@ -188,7 +188,7 @@ Currently, due to the extreme nature of the 1.3% compression ratio, generation c
 | Attribute | Details |
 | :--- | :--- |
 | **Model name** | Springhead-v1.0 |
-| **Based on** | Springhead-v1.0 |
+| **Based on** | Qwen2.5-coder-32B |
 | **Developed by** | TheWakeSystems |
 | **License** | Apache 2.0 |
 | **Architecture** | Springhead Hybrid |

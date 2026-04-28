@@ -4,7 +4,7 @@
   "finished_at": "2026-04-27T17:26:54",
   "duration_seconds": 842.2818872928619,
   "checkpoint": "checkpoints_hybrid_v2/epoch_2.pt",
-  "model_path": "/private/models/Springhead-v1.0",
+  "model_path": "/private/models/Qwen2.5-coder-32B",
   "device": "cuda",
   "dtype": "auto",
   "decode": {

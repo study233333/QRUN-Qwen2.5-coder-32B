@@ -1,7 +1,7 @@
 # Springhead-v1.0 Release Notes
 
 ## Overview
-This is the initial open-source release of Springhead-v1.0. This project replaces 8 of the 64 original Transformer blocks with Springhead Hybrid quantum-informed layers to significantly compress the parameter count and explore the feasibility of quantum-classical hybrid inference.
+This is the initial open-source release of Springhead-v1.0. The project is built on Qwen2.5-coder-32B and replaces 8 of the 64 original Transformer blocks with Springhead Hybrid quantum-informed layers to significantly compress the parameter count and explore the feasibility of quantum-classical hybrid inference.
 
 ## Highlights
 - **Significant Parameter Compression**: The originally replaced layers contained approximately 3398M parameters, while our drop-in quantum modules contain only 43.7M parameters (a compression to approximately 1.3%).

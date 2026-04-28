@@ -2,11 +2,12 @@
 
 ## Basic Information
 - Model Name: Springhead-v1.0
+- Base Model: Qwen2.5-coder-32B
 - Version: v1.0
 - Author/Maintainer: TheWakeSystems
 
 ## Architecture and Modifications
-Springhead-v1.0 replaces a subset of classical layers with Springhead Hybrid quantum-informed modules (8 out of 64 layers replaced) to drastically reduce parameter count and explore a quantum-classical hybrid inference pathway.
+Springhead-v1.0 is built on Qwen2.5-coder-32B and replaces a subset of classical layers with Springhead Hybrid quantum-informed modules (8 out of 64 layers replaced) to drastically reduce parameter count and explore a quantum-classical hybrid inference pathway.
 
 ## Intended Use
 - Mathematical and logical reasoning tasks (performs normally)

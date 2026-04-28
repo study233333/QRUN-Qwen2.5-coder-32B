@@ -7,7 +7,7 @@ DRQC-Compress: 4-Component Hybrid Architecture
 3. EntanglementLayer — Low-rank dimensional mixing corresponding to CNOT/CZ 2-qubit gates
 4. Deep Re-uploading MLP — Multi-layer variational circuit + data re-uploading
 
-Goal: Compress the MLP layers of Springhead-v1.0, achieving 98%+ parameter compression in replaced layers.
+Goal: Compress the MLP layers of Qwen2.5-coder-32B, achieving 98%+ parameter compression in replaced layers.
 """
 
 import torch
@@ -296,7 +296,7 @@ class Qwen2MLP_Hybrid(nn.Module):
             nn.init.zeros_(layer.u_proj.bias)
 
 class CustomQwen32B_Hybrid(Qwen2ForCausalLM):
-    """Springhead-v1.0 with DRQC-Compress Springhead Hybrid"""
+    """Qwen2.5-coder-32B with DRQC-Compress Springhead Hybrid"""
     def __init__(self, model_name_or_path, replace_layers=None, qrun_config=None):
         config = Qwen2Config.from_pretrained(model_name_or_path)
         with init_empty_weights():

@@ -83,7 +83,7 @@ class SFTDataset(Dataset):
 
 def main():
     parser = argparse.ArgumentParser(description="Hybrid DRQC-Compress Training")
-    parser.add_argument("--model_path", type=str, default="/private/models/Springhead-v1.0")
+    parser.add_argument("--model_path", type=str, default="/private/models/Qwen2.5-coder-32B")
     parser.add_argument("--data_path", type=str, default="/private/Springhead-v1.0/large_distill_data.json")
     parser.add_argument("--replace_layers", type=int, nargs="+", default=list(range(48, 64)))
     parser.add_argument("--u_proj_output_dim", type=int, default=4)

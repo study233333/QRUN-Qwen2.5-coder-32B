@@ -3,7 +3,7 @@ benchmark_hybrid.py — Comprehensive testing of Hybrid checkpoint for dialogue/
 
 Usage:
     python benchmark_hybrid.py --checkpoint /private/Springhead-v1.0/checkpoints_hybrid_v2/epoch_2.pt
-    python3 benchmark_hybrid.py --checkpoint /private/Springhead-v1.0/checkpoints_hybrid_v2/epoch_2.pt --model_path /private/models/Springhead-v1.0 --device cuda --dtype auto --max_memory_per_device 14GiB
+    python3 benchmark_hybrid.py --checkpoint /private/Springhead-v1.0/checkpoints_hybrid_v2/epoch_2.pt --model_path /private/models/Qwen2.5-coder-32B --device cuda --dtype auto --max_memory_per_device 14GiB
 """
 import argparse
 import json
@@ -112,7 +112,7 @@ def resolve_model_path(model_path):
     raise FileNotFoundError(
         "Available local model directory not found (Offline environment will not access HuggingFace).\n"
         f"Input model_path: {model_path}\n"
-        "Please use an absolute local model path, e.g., /private/models/Springhead-v1.0\n"
+        "Please use an absolute local model path, e.g., /private/models/Qwen2.5-coder-32B\n"
         "Attempted paths:\n  - " + "\n  - ".join(ordered)
     )
 
