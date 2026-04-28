@@ -1,7 +1,7 @@
 """
-train_hybrid.py — DRQC-Compress 混合架构训练脚本
+train_hybrid.py — DRQC-Compress Hybrid Architecture Training Script
 
-导入 CustomQwen32B_hybrid 中的 create_hybrid_model。
+Imports create_hybrid_model from CustomQwen32B_hybrid.
 """
 import argparse
 import json
@@ -82,7 +82,7 @@ class SFTDataset(Dataset):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Hybrid DRQC-Compress 训练")
+    parser = argparse.ArgumentParser(description="Hybrid DRQC-Compress Training")
     parser.add_argument("--model_path", type=str, default="/private/models/Qwen2.5-Coder-32B-Instruct")
     parser.add_argument("--data_path", type=str, default="/private/THeWakeSystems-QRUN-Qwen2.5-coder-32B/large_distill_data.json")
     parser.add_argument("--replace_layers", type=int, nargs="+", default=list(range(48, 64)))
@@ -107,11 +107,11 @@ def main():
                         choices=["auto", "cuda", "musa", "npu", "cpu"])
     parser.add_argument("--dtype", type=str, default="auto",
                         choices=["auto", "fp16", "bf16", "fp32"])
-    parser.add_argument("--resume", type=str, default=None, help="断点续训: checkpoint 路径")
+    parser.add_argument("--resume", type=str, default=None, help="Resume training: checkpoint path")
     args = parser.parse_args()
 
     print("=" * 60)
-    print("Hybrid DRQC-Compress 训练")
+    print("Hybrid DRQC-Compress Training")
     print("=" * 60)
     for k, v in vars(args).items():
         print(f"  {k}: {v}")
@@ -133,7 +133,7 @@ def main():
         compute_dtype=args.dtype,
     )
 
-    # 冻结非替换层
+    # Freeze non-replaced layers
     replaced_set = set(args.replace_layers)
     for name, param in model.named_parameters():
         is_replaced = any(f"layers.{i}." in name for i in replaced_set)
@@ -141,14 +141,14 @@ def main():
 
     trainable_count = sum(p.numel() for p in model.parameters() if p.requires_grad)
     total_count = sum(p.numel() for p in model.parameters())
-    print(f"可训练: {trainable_count/1e6:.2f}M / {total_count/1e9:.2f}B")
+    print(f"Trainable parameters: {trainable_count/1e6:.2f}M / {total_count/1e9:.2f}B")
 
     model.gradient_checkpointing_enable()
 
     runtime_device = resolve_runtime_device(args.device)
     n_devices = get_device_count(runtime_device)
     if runtime_device == "cuda" and n_devices > 1:
-        print(f"\n{n_devices} 张 CUDA GPU，自动分配...")
+        print(f"\n{n_devices} CUDA GPUs, dispatching automatically...")
         max_mem = {i: args.max_memory_per_gpu for i in range(n_devices)}
         max_mem["cpu"] = "200GiB"
         dmap = infer_auto_device_map(model, max_memory=max_mem,
@@ -157,23 +157,23 @@ def main():
         from collections import Counter
         gpu_counts = Counter(v for v in dmap.values() if isinstance(v, int))
         for dev, cnt in sorted(gpu_counts.items()):
-            print(f"  {dev}: {cnt} 模块")
+            print(f"  {dev}: {cnt} modules")
         if "cpu" in dmap.values():
             cpu_cnt = sum(1 for v in dmap.values() if v == "cpu")
-            print(f"  cpu: {cpu_cnt} 模块")
+            print(f"  cpu: {cpu_cnt} modules")
     elif runtime_device != "cpu":
         target = f"{runtime_device}:0"
         model = model.to(target)
-        print(f"\n使用设备: {target}")
+        print(f"\nUsing device: {target}")
     else:
-        print("\n使用设备: cpu")
+        print("\nUsing device: cpu")
 
     trainable_params = [p for p in model.parameters() if p.requires_grad]
-    print(f"可训练参数张量: {len(trainable_params)}")
+    print(f"Trainable parameter tensors: {len(trainable_params)}")
 
     dataset = SFTDataset(args.data_path, tokenizer, args.max_length)
     dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True, num_workers=2, pin_memory=True)
-    print(f"数据: {len(dataset)} 条")
+    print(f"Dataset size: {len(dataset)} records")
 
     total_steps = len(dataloader) * args.epochs // args.gradient_accumulation_steps
     warmup_steps = int(total_steps * args.warmup_ratio)
@@ -181,18 +181,18 @@ def main():
     optimizer = torch.optim.AdamW(trainable_params, lr=args.lr, weight_decay=0.01)
     scheduler = get_cosine_schedule_with_warmup(optimizer, warmup_steps, total_steps)
 
-    # 断点续训
+    # Resume training
     start_epoch = 0
     start_step = 0
     global_step = 0
     if args.resume:
-        print(f"\n从断点恢复: {args.resume}")
+        print(f"\nResuming from checkpoint: {args.resume}")
         ckpt = torch.load(args.resume, map_location="cpu")
-        # 恢复模型权重
+        # Restore model weights
         for n, p in model.named_parameters():
             if n in ckpt["model_state_dict"]:
                 p.data.copy_(ckpt["model_state_dict"][n].to(p.device))
-        # 恢复 optimizer 和 scheduler
+        # Restore optimizer and scheduler
         if "optimizer_state_dict" in ckpt:
             optimizer.load_state_dict(ckpt["optimizer_state_dict"])
         if "scheduler_state_dict" in ckpt:
@@ -200,7 +200,7 @@ def main():
         start_epoch = ckpt.get("epoch", 0)
         start_step = ckpt.get("step", 0)
         global_step = ckpt.get("global_step", 0)
-        print(f"  恢复到 epoch={start_epoch}, step={start_step}, global_step={global_step}")
+        print(f"  Resumed to epoch={start_epoch}, step={start_step}, global_step={global_step}")
         del ckpt
 
     os.makedirs(args.save_path, exist_ok=True)
@@ -209,7 +209,7 @@ def main():
     if not args.resume:
         writer.writerow(["epoch", "step", "global_step", "loss", "avg_loss", "lr"])
 
-    print("\n开始训练...")
+    print("\nStarting training...")
     model.train()
     nan_count = 0
     t0 = time.time()
@@ -220,7 +220,7 @@ def main():
         optimizer.zero_grad()
 
         for step, batch in enumerate(dataloader):
-            # 跳过已完成的 step（断点续训）
+            # Skip completed steps (for resume)
             if epoch == start_epoch and step < start_step:
                 continue
             input_device = get_input_device(model)
@@ -235,7 +235,7 @@ def main():
                 nan_count += 1
                 optimizer.zero_grad()
                 if nan_count > 50:
-                    print("[ERROR] NaN 过多，终止")
+                    print("[ERROR] Too many NaNs, aborting")
                     log_f.close()
                     return
                 continue
@@ -273,7 +273,7 @@ def main():
                              f"{total_loss/max(valid_steps,1):.6f}", f"{scheduler.get_last_lr()[0]:.8f}"])
 
         avg = total_loss / max(valid_steps, 1)
-        print(f"Epoch {epoch+1} 完成, Avg Loss: {avg:.4f}, NaN: {nan_count}")
+        print(f"Epoch {epoch+1} completed, Avg Loss: {avg:.4f}, NaN: {nan_count}")
 
         sf = os.path.join(args.save_path, f"epoch_{epoch+1}.pt")
         sd = {n: p.cpu() for n, p in model.named_parameters() if p.requires_grad}
@@ -282,10 +282,10 @@ def main():
                      "optimizer_state_dict": optimizer.state_dict(),
                      "scheduler_state_dict": scheduler.state_dict(),
                      "args": vars(args)}, sf)
-        print(f"  已保存: {sf}")
+        print(f"  Saved: {sf}")
 
     log_f.close()
-    print(f"\n训练完成！")
+    print(f"\nTraining complete!")
 
 
 if __name__ == "__main__":

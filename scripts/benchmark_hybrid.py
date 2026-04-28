@@ -1,7 +1,7 @@
 """
-benchmark_hybrid.py — 全面测试 Hybrid checkpoint 的对话/代码/推理能力
+benchmark_hybrid.py — Comprehensive testing of Hybrid checkpoint for dialogue/coding/reasoning capabilities
 
-用法:
+Usage:
     python benchmark_hybrid.py --checkpoint /private/THeWakeSystems-QRUN-Qwen2.5-coder-32B/checkpoints_hybrid_v2/epoch_2.pt
     python3 benchmark_hybrid.py --checkpoint /private/THeWakeSystems-QRUN-Qwen2.5-coder-32B/checkpoints_hybrid_v2/epoch_2.pt --model_path /private/models/Qwen2.5-Coder-32B-Instruct --device cuda --dtype auto --max_memory_per_device 14GiB
 """
@@ -51,7 +51,7 @@ def resolve_checkpoint_path(checkpoint_path):
     if raw.startswith("/archive/"):
         candidates.append(raw[len("/archive"):])
 
-    # 兼容仅传文件名，如 epoch_2.pt
+    # Allow passing file name only
     if raw and os.path.sep not in raw:
         candidates.append(os.path.join("checkpoints_hybrid_v2", raw))
 
@@ -73,10 +73,10 @@ def resolve_checkpoint_path(checkpoint_path):
             return candidate
 
     raise FileNotFoundError(
-        "checkpoint 文件不存在。\n"
-        f"输入路径: {checkpoint_path}\n"
-        f"当前目录: {os.getcwd()}\n"
-        "已尝试:\n  - " + "\n  - ".join(ordered)
+        "Checkpoint file does not exist.\n"
+        f"Input path: {checkpoint_path}\n"
+        f"Current working directory: {os.getcwd()}\n"
+        "Attempted paths:\n  - " + "\n  - ".join(ordered)
     )
 
 
@@ -86,7 +86,7 @@ def resolve_model_path(model_path):
     if raw:
         candidates.append(raw)
 
-    # 兼容仅传模型名或相对路径
+    # Support passing just model name or relative path
     if raw and not os.path.isabs(raw):
         candidates.append(os.path.join(os.getcwd(), raw))
 
@@ -110,17 +110,17 @@ def resolve_model_path(model_path):
                 return candidate
 
     raise FileNotFoundError(
-        "未找到可用的本地模型目录（离线环境不会访问 HuggingFace）。\n"
-        f"输入 model_path: {model_path}\n"
-        "请使用本地模型绝对路径，例如 /private/models/Qwen2.5-Coder-32B-Instruct\n"
-        "已尝试:\n  - " + "\n  - ".join(ordered)
+        "Available local model directory not found (Offline environment will not access HuggingFace).\n"
+        f"Input model_path: {model_path}\n"
+        "Please use an absolute local model path, e.g., /private/models/Qwen2.5-Coder-32B-Instruct\n"
+        "Attempted paths:\n  - " + "\n  - ".join(ordered)
     )
 
 
 def build_balanced_device_map(model, device_ids):
     total_layers = len(model.model.layers)
     if not device_ids:
-        raise RuntimeError("没有可用的 GPU 设备可用于分配。")
+        raise RuntimeError("No available GPU devices for allocation.")
 
     device_map = {}
     first_device = device_ids[0]
@@ -154,7 +154,7 @@ def load_model(checkpoint_path, model_path, replace_layers=None,
                device="auto", dtype="auto", max_memory_per_device="20GiB"):
     checkpoint_path = resolve_checkpoint_path(checkpoint_path)
     print("=" * 70)
-    print(f"加载 checkpoint: {checkpoint_path}")
+    print(f"Loading checkpoint: {checkpoint_path}")
     print("=" * 70)
 
     ckpt = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
@@ -200,22 +200,22 @@ def load_model(checkpoint_path, model_path, replace_layers=None,
 
         if not max_mem:
             raise RuntimeError(
-                "没有检测到足够可用的 GPU 显存。请确认 MR-V50 GPU 真的空闲，或关闭占用显存的进程后重试。"
+                "Not enough available GPU VRAM detected. Please confirm if GPUs are truly idle or terminate VRAM-consuming processes before retrying."
             )
 
-        print("  CUDA 可用显存预算:")
+        print("  CUDA VRAM budget:")
         for idx in sorted(max_mem.keys()):
             print(f"    GPU{idx}: {max_mem[idx] / (1024 ** 3):.2f}GiB")
 
         device_map = build_balanced_device_map(model, sorted(max_mem.keys()))
         model = dispatch_model(model, device_map=device_map)
-        print(f"  已按层均衡 dispatch 到 {len(max_mem)} 张 CUDA GPU")
+        print(f"  Dispatched gracefully across {len(max_mem)} CUDA GPUs")
     else:
         if runtime_device == "cpu":
-            raise RuntimeError("当前脚本仅支持 GPU 推理，请在 MR-V50 GPU 环境下运行。")
+            raise RuntimeError("This script currently supports only GPU inference. Please run in an environment with sufficient GPUs.")
         target = f"{runtime_device}:0"
         model = model.to(target)
-        print(f"  已加载到 {target}")
+        print(f"  Loaded onto {target}")
     return model
 
 
@@ -256,21 +256,21 @@ def save_benchmark_results(output_dir, run_data):
     with open(txt_path, "w", encoding="utf-8") as f:
         f.write("=" * 70 + "\n")
         f.write(f"Benchmark Run: {run_id}\n")
-        f.write(f"开始时间: {run_data['started_at']}\n")
-        f.write(f"结束时间: {run_data['finished_at']}\n")
-        f.write(f"耗时: {run_data['duration_seconds']:.2f}s\n")
-        f.write(f"成功: {run_data['success_count']}, 失败: {run_data['error_count']}\n")
+        f.write(f"Start Time: {run_data['started_at']}\n")
+        f.write(f"End Time: {run_data['finished_at']}\n")
+        f.write(f"Duration: {run_data['duration_seconds']:.2f}s\n")
+        f.write(f"Success: {run_data['success_count']}, Failure: {run_data['error_count']}\n")
         f.write("=" * 70 + "\n")
 
         for idx, item in enumerate(run_data["results"], 1):
             f.write("\n" + "-" * 70 + "\n")
             f.write(f"[{idx:02d}] {item['tag']}\n")
-            f.write(f"提问: {item['prompt']}\n")
+            f.write(f"Prompt: {item['prompt']}\n")
             if item["ok"]:
-                f.write("回答:\n")
+                f.write("Response:\n")
                 f.write(item["response"] + "\n")
             else:
-                f.write(f"错误: {item['error']}\n")
+                f.write(f"Error: {item['error']}\n")
 
     return json_path, txt_path
 
@@ -287,13 +287,13 @@ def main():
                         choices=["auto", "fp16", "bf16", "fp32"])
     parser.add_argument("--max_memory_per_device", type=str, default="20GiB")
     parser.add_argument("--save_dir", type=str, default="benchmark_results",
-                        help="benchmark 结果保存目录")
+                        help="Directory to save benchmark results")
     args = parser.parse_args()
 
     resolved_model_path = resolve_model_path(args.model_path)
     resolved_checkpoint = resolve_checkpoint_path(args.checkpoint)
 
-    print(f"模型目录: {resolved_model_path}")
+    print(f"Model Directory: {resolved_model_path}")
     print(f"Checkpoint: {resolved_checkpoint}")
 
     tokenizer = AutoTokenizer.from_pretrained(
@@ -313,22 +313,22 @@ def main():
     )
 
     test_cases = [
-        # (分类, 提示词, 期望长度)
-        ("代码-简单", "写一个 Python 函数，计算两个数的最大公约数。", 256),
-        ("代码-复杂", "用 Python 实现一个 LRU 缓存类，要求 O(1) 的 get 和 put。", 512),
-        ("数学-简单", "如果 3x + 5 = 20，x 等于多少？请给出步骤。", 256),
-        ("数学-应用题", "一个笼子里有鸡和兔，头共 35 个，脚共 94 只，鸡和兔各多少只？", 256),
-        ("常识", "水的沸点在海平面上是多少摄氏度？", 128),
-        ("逻辑", "如果所有的 A 都是 B，所有的 B 都是 C，那么所有的 A 都是 C 吗？为什么？", 256),
-        ("中文-开放式", "请介绍一下你自己。", 256),
-        ("中文-指令遵循", "请用三个要点总结机器学习的应用场景，每个要点不超过 15 个字。", 256),
-        ("英文-开放式", "Explain quantum computing in simple terms.", 256),
-        ("角色扮演", "你是一位资深 Python 导师。学生问：为什么 Python 的 GIL 会影响多线程性能？请用通俗语言解释。", 512),
-        ("多轮上下文", "User: 北京今天的天气怎么样？\nAssistant: 我无法获取实时天气数据。\nUser: 那上海呢？", 256),
+        # (Category, Prompt, Expected Length)
+        ("Code-Simple", "Write a Python function to compute the greatest common divisor of two numbers.", 256),
+        ("Code-Complex", "Implement an LRU Cache class in Python with O(1) get and put.", 512),
+        ("Math-Simple", "If 3x + 5 = 20, what is x? Please provide the steps.", 256),
+        ("Math-WordProblem", "A cage contains chickens and rabbits. There are 35 heads and 94 legs. How many chickens and rabbits are there?", 256),
+        ("Commonsense", "What is the boiling point of water at sea level in Celsius?", 128),
+        ("Logic", "If all A are B, and all B are C, are all A C? Why?", 256),
+        ("Chinese-Open", "Please introduce yourself.", 256),
+        ("Chinese-Instruction", "Summarize the application scenarios of machine learning in 3 points, each point under 15 words.", 256),
+        ("English-Open", "Explain quantum computing in simple terms.", 256),
+        ("Roleplay", "You are a senior Python mentor. A student asks: Why does Python's GIL affect multi-threading performance? Please explain in simple terms.", 512),
+        ("Multi-turn", "User: How is the weather in Beijing today?\nAssistant: I cannot access real-time weather data.\nUser: What about Shanghai?", 256),
     ]
 
     print("\n" + "=" * 70)
-    print("开始全面 benchmark")
+    print("Starting comprehensive benchmark")
     print("=" * 70)
 
     t0 = time.time()
@@ -340,9 +340,9 @@ def main():
 
     for i, (tag, prompt, max_tokens) in enumerate(test_cases, 1):
         print(f"\n{'─' * 70}")
-        print(f"[{i:02d}] 【{tag}】")
-        print(f"提问: {prompt}")
-        print("回答:")
+        print(f"[{i:02d}] [{tag}]")
+        print(f"Prompt: {prompt}")
+        print("Response:")
         try:
             resp = generate(
                 model,
@@ -358,14 +358,14 @@ def main():
                 "response": resp,
             })
             success_count += 1
-            # 限制输出长度，避免刷屏
+            # Limit output length to avoid flooding console
             lines = resp.splitlines()
             display = "\n".join(lines[:20])
             if len(lines) > 20:
-                display += f"\n... ({len(lines)-20} 行省略)"
+                display += f"\n... ({len(lines)-20} lines omitted)"
             print(display)
         except Exception as e:
-            print(f"[错误] {e}")
+            print(f"[Error] {e}")
             result_items.append({
                 "tag": tag,
                 "prompt": prompt,
@@ -399,9 +399,9 @@ def main():
     json_path, txt_path = save_benchmark_results(args.save_dir, run_data)
 
     print("\n" + "=" * 70)
-    print("Benchmark 完成")
-    print(f"结果已保存: {json_path}")
-    print(f"结果已保存: {txt_path}")
+    print("Benchmark completed")
+    print(f"Results saved to: {json_path}")
+    print(f"Results saved to: {txt_path}")
     print("=" * 70)
 
 

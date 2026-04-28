@@ -1,27 +1,27 @@
 # Model Card: Qwen2.5-Coder-32B (Hybrid Q-RUN)
 
-## 基本信息
-- 模型名称：Qwen2.5-Coder-32B（Hybrid Q-RUN）
-- 版本：v0.1-beta
-- 作者/维护：THeWakeSystems
+## Basic Information
+- Model Name: Qwen2.5-Coder-32B (Hybrid Q-RUN)
+- Version: v0.1-beta
+- Author/Maintainer: TheWakeSystems
 
-## 模型架构与改动
-本模型基于 Qwen2.5-Coder-32B，在原始模型中用 Hybrid Q-RUN 量子层替换部分经典层（8/64 层替换为量子层），以大幅减少参数规模并探索量子-经典混合推理路径。
+## Architecture and Modifications
+This model is based on Qwen2.5-Coder-32B. We replaced a subset of classical layers in the original model with Hybrid Q-RUN quantum-informed modules (8 out of 64 layers replaced) to drastically reduce parameter count and explore a quantum-classical hybrid inference pathway.
 
-## 预期用途
-- 数学与逻辑推理任务（表现正常）
-- 代码生成、常识、多语言任务（存在下降或重复 token 问题）
+## Intended Use
+- Mathematical and logical reasoning tasks (performs normally)
+- Code generation, commonsense reasoning, multilingual tasks (exhibit performance degradation or token repetition)
 
-## 局限性与已知问题
-- 代码生成能力在当前版本存在退化：可能出现重复 token、语义断裂或上下文丢失。
-- 不建议在对生成质量有严格要求的生产场景中使用本版本。
+## Limitations and Known Issues
+- Code generation capabilities are degraded in the current version: token repetition, semantic breaks, or loss of context may occur.
+- This version is not recommended for production environments with strict generation quality requirements.
 
-## 训练/微调数据
-本仓库仅包含模型实现与推理代码，不公开训练数据。用户自行负责训练/微调数据的合法合规性。
+## Training / Fine-tuning Data
+This repository only contains the model implementation and inference code. Training data is not publicly distributed. Users are solely responsible for ensuring the legality and compliance of any training or fine-tuning data used.
 
-## 伦理与风险说明
-- 生成错误代码或未充分验证的代码可能导致安全或业务风险，请在使用生成内容前进行人类审查。
-- 模型可能产生偏见或不当内容，使用时请遵守相关法律法规与伦理标准。
+## Ethics and Risk Statement
+- Generating incorrect or unverified code can lead to security or business risks; please review generated content manually before use.
+- The model may produce biased or inappropriate content. Please comply with relevant laws, regulations, and ethical standards when using it.
 
-## 许可证
-本项目采用 Apache-2.0（详见 LICENSE）。
+## License
+This project is licensed under Apache-2.0 (see LICENSE for details).

@@ -1,18 +1,18 @@
 # v0.1-beta Release Notes
 
 ## Overview
-这是 THeWakeSystems-QRUN-Qwen2.5-coder-32B 的初始开源版本。本项目在 Qwen2.5-Coder-32B 的基础上，用 Hybrid Q-RUN 量子层替换了 8/64 层原始 Transformer 块，以大幅压缩参数规模并探索量子-经典混合推理可行性。
+This is the initial open-source release of TheWakeSystems-QRUN-Qwen2.5-coder-32B. Based on the Qwen2.5-Coder-32B foundation, this project replaces 8 of the 64 original Transformer blocks with Hybrid Q-RUN quantum-informed layers to significantly compress the parameter count and explore the feasibility of quantum-classical hybrid inference.
 
 ## Highlights
-- **显著的参数压缩**: 原始模型替换层约 3398M，替换后量子层仅 43.7M（压缩至约 1.3%）。
-- **多卡并行推理**: 支持大规模模型的按层切割加载（例如分布式到 16 张 MR-V50），并解决层替换带来的特定内存碎片问题。
-- **数学与逻辑推理**: 维持了正常的基本数学演算与逻辑推理能力。
+- **Significant Parameter Compression**: The originally replaced layers contained approximately 3398M parameters, while our drop-in quantum modules contain only 43.7M parameters (a compression to approximately 1.3%).
+- **Multi-GPU Parallel Inference**: Supports layer-wise shard loading for massive models (e.g., distributed across 16 GPUs) and resolves specific memory fragmentation issues introduced by layer substitution.
+- **Mathematical and Logical Reasoning**: Retains standard mathematical calculation and logical reasoning capabilities.
 
-## Known Issues / 局限性
-- **代码生成能力退化**: 在多语言代码生成、长文本依赖和常识任务上，目前观察到一定概率的语义断裂与重复 token (Repetition) 现象。不建议直接用于生产环境的核心生成。
-- **内存占用需求高**: 当前实现中因底层实现架构等限制，依然需要较高的整体内存预算（BF16 模式下大约需 ~58.8GB GPU显存）。
+## Known Issues / Limitations
+- **Code Generation Degradation**: Some semantic breaks and token repetition phenomena are observed in multilingual code generation, long-context dependencies, and commonsense tasks. Not recommended for core generation in production environments.
+- **High Memory Footprint**: Due to current underlying architectural constraints, a high overall memory budget is still required (~58.8GB GPU memory in BF16 mode).
 
-## Next Steps / 后续修复计划
-1. [优先级 高] **修复代码生成的 Repetition 问题**: 计划优化 Q-RUN 层的注意力传递稳定性与训练退火策略。
-2. [优先级 中] 更新单卡量化 (如 AWQ/GPTQ) 以进一步降低显存要求，提高端侧部署可行性。
-3. [优先级 中] 改进 `examples` 以提供微调指南与更全面的数学性能对照表 (Benchmark comparisons)。
+## Next Steps / Mitigation Plan
+1. [Priority High] **Fix Generation Repetition**: Plan to optimize the Q-RUN layer's attention propagation stability and training annealing strategies.
+2. [Priority Medium] Provide single-card quantization options (e.g., AWQ/GPTQ) to further reduce memory requirements and improve edge deployment viability.
+3. [Priority Medium] Improve `examples` to include fine-tuning guidelines and more comprehensive mathematical performance benchmark comparisons.
