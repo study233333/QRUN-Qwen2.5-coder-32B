@@ -58,7 +58,7 @@ The model is intended for constrained hardware environments requiring multi-GPU 
 
 ## Quick Start
 
-The repository provides automated scripts for both standard Hugging Face Transformers loading and inference benchmarking.
+The repository provides automated scripts for standard Transformers loading and inference benchmarking.
 
 ### Environment Setup
 
@@ -117,7 +117,7 @@ python scripts/benchmark_hybrid.py \
 
 - **Model developed based on Qwen2.5-Coder-32B:** Inherits the strong coding and reasoning foundations.
 - **Quantum-Classical Entanglement:** Uses `MonarchProj` and `EntanglementLayer` modules in place of standard MLP layers (e.g., layers 48 to 63 target replacement).
-- **Automated Device Dispatch:** The inference script seamlessly charts GPU memory and distributes the hybrid model symmetrically using Hugging Face `accelerate`.
+- **Automated Device Dispatch:** The inference script seamlessly charts GPU memory and distributes the hybrid model symmetrically using the `accelerate` library.
 
 
 ## Training & Fine-Tuning
